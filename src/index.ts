@@ -1,5 +1,5 @@
 import discord, { ApplicationCommandDataResolvable, Client, ClientEvents, Collection } from 'discord.js';
-import Logger from './classes/Logger';
+
 import { ClientCommandHandler, IClientOptions } from './typings/ClientOptions';
 import glob from 'glob';
 import { promisify } from 'util';
@@ -8,7 +8,6 @@ import { Command as c } from './typings/Command';
 
 const globsify = promisify(glob);
 
-let logger = new Logger("[DJS]");
 
 class ExtendedClient extends discord.Client {
   private clientOptions: IClientOptions;
@@ -26,7 +25,7 @@ class ExtendedClient extends discord.Client {
       const url = this.clientOptions.commandPath.endsWith("/") ? this.clientOptions.commandPath + "*/*{.ts,.js}" : this.clientOptions.commandPath + "/*/*{.ts,.js}";
       (await globsify(url)).forEach(async file => {
         const command: c = await utils.importFile(file);
-        if(!command.name) return logger.error("Missed name argument in command: " + file);
+        if(!command.name) return console.error("Missed name argument in command: " + file);
         this.commands.set(command.name, command);
         commands.push(command);
       })
@@ -46,7 +45,7 @@ class ExtendedClient extends discord.Client {
       })
     }
     this.login(this.clientOptions.token).catch(() => {
-      logger.error("Invalid Token!");
+      console.error("Invalid Token!");
     });
   }
 
@@ -63,9 +62,9 @@ class ExtendedClient extends discord.Client {
     const url = eventPath.endsWith("/") ? eventPath + "*{.ts,.js}" : eventPath + "/*{.ts,.js}";
     (await globsify(url)).forEach(async file => {
       const event: Event <keyof ClientEvents> = await utils.importFile(file);
-      if(!event.name) logger.error("Invalid Event: " + file);
+      if(!event.name) console.error("Invalid Event: " + file);
       else {
-        logger.success("Loaded event: " + event.name);
+        console.log("Loaded event: " + event.name);
         this.on(event.name, event.callback);
       }
     })
