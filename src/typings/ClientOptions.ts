@@ -1,4 +1,4 @@
-import { Intents } from "discord.js";
+import { ApplicationCommandDataResolvable, Intents } from "discord.js";
 
 
 
@@ -9,5 +9,10 @@ export interface IClientOptions {
   commandPath?: filePath;
   eventsPath?: filePath;
   intents: Intents | number;
+  guildIds?: string[];
+}
+
+export type ClientCommandHandler = {
   guildId?: string;
+  commands: ApplicationCommandDataResolvable[];
 }
